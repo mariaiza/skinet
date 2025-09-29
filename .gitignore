@@ -1,0 +1,85 @@
+# ==============================
+# Build / Output Folders
+# ==============================
+**/bin/
+**/obj/
+**/out/
+artifacts/
+
+# ==============================
+# Visual Studio / IDE Files
+# ==============================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+
+# ==============================
+# NuGet Packages / Caches
+# ==============================
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+*.nuget.props
+*.nuget.targets
+
+# ==============================
+# .NET Core / .NET 9 Specific
+# ==============================
+project.lock.json
+project.fragment.lock.json
+global.json
+
+# ==============================
+# ASP.NET Core / Web
+# ==============================
+wwwroot/lib/
+Properties/launchSettings.json
+
+# ==============================
+# Node / npm (if any frontend)
+# ==============================
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ==============================
+# Logs
+# ==============================
+*.log
+TestResults/
+
+# ==============================
+# Coverage / Test
+# ==============================
+*.coverage
+*.coveragexml
+
+# ==============================
+# OS / Misc
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Docker / Container (if used)
+# ==============================
+docker-compose.override.yml
+*.dockerfile
+*.env
+
+# ==============================
+# Other common files to ignore
+# ==============================
+.vagrant/
+*.bak
+*.swp

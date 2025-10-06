@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,21 +9,23 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController(IProductRepository repo) : ControllerBase
+public class ProductsController(IGenericRepository<Product> repo) : ControllerBase
 {
 
     [HttpGet()]
     public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string? brand, string? type,
             string? sort)
     {
+        var spec = new ProductSpecification(brand, type, sort);
+        var products = await repo.ListAsync(spec);
         // Dummy implementation for demonstration purposes
-        return Ok(await repo.GetProductsAsync(brand, type, sort));
+        return Ok(products);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
-        var product = await repo.GetProductByIdAsync(id);
+        var product = await repo.GetByIdAsync(id);
         if (product == null) return NotFound();
         return product;
     }
@@ -30,9 +33,9 @@ public class ProductsController(IProductRepository repo) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Product>> CreateProduct(Product product)
     {
-        repo.AddProduct(product);
+        repo.Add(product);
 
-        if (await repo.SaveChangesAsync())
+        if (await repo.SaveAllAsync())
         {
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
@@ -47,11 +50,11 @@ public class ProductsController(IProductRepository repo) : ControllerBase
 
         if (!ProductExists(id)) return NotFound("Product not found");
 
-        repo.UpdateProduct(product);
+        repo.Update(product);
 
         try
         {
-            if(await repo.SaveChangesAsync())
+            if(await repo.SaveAllAsync())
                 return NoContent(); 
         }
         catch (DbUpdateConcurrencyException)
@@ -65,12 +68,12 @@ public class ProductsController(IProductRepository repo) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        var product = await repo.GetProductByIdAsync(id);
+        var product = await repo.GetByIdAsync(id);
         if (product == null) return NotFound("Product not found");
 
-        repo.DeleteProduct(product);
+        repo.Remove(product);
 
-        if(await repo.SaveChangesAsync())
+        if(await repo.SaveAllAsync())
             return NoContent();
 
         return BadRequest("Failed to delete product");
@@ -79,16 +82,18 @@ public class ProductsController(IProductRepository repo) : ControllerBase
     [HttpGet("brands")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
     {
-        return Ok(await repo.GetBrandsAsync());
+        var spec = new BrandListSpecification();
+        return Ok(await repo.ListAsync(spec));
     }
 
     [HttpGet("types")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
     {
-        return Ok(await repo.GetTypesAsync());
+        var spec = new TypeListSpecification();
+        return Ok(await repo.ListAsync(spec));
     }   
     private bool ProductExists(int id)
     {
-        return repo.ProductExists(id);
+        return repo.Exists(id);
     }
 }
